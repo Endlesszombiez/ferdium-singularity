@@ -9,7 +9,6 @@ import {
   mdiLock,
   mdiMenu,
   mdiPlusBox,
-  mdiViewGrid,
   mdiViewSplitVertical,
 } from '@mdi/js';
 import { inject, observer } from 'mobx-react';
@@ -29,7 +28,6 @@ import {
   settingsShortcutKey,
   splitModeToggleShortcutKey,
   todosToggleShortcutKey,
-  workspaceToggleShortcutKey,
 } from '../../environment';
 import { todosStore } from '../../features/todos';
 import { todoActions } from '../../features/todos/actions';
@@ -56,14 +54,6 @@ const messages = defineMessages({
     id: 'sidebar.unmuteApp',
     defaultMessage: 'Enable notifications & audio',
   },
-  openWorkspaceDrawer: {
-    id: 'sidebar.openWorkspaceDrawer',
-    defaultMessage: 'Open workspace drawer',
-  },
-  closeWorkspaceDrawer: {
-    id: 'sidebar.closeWorkspaceDrawer',
-    defaultMessage: 'Close workspace drawer',
-  },
   openTodosDrawer: {
     id: 'sidebar.openTodosDrawer',
     defaultMessage: 'Open Ferdium Todos',
@@ -87,14 +77,12 @@ interface IProps extends WrappedComponentProps {
   isAppMuted: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   isMenuCollapsed: boolean;
-  isWorkspaceDrawerOpen: boolean;
   isTodosServiceActive: boolean;
   actions?: Actions;
   stores?: RealStores;
 
   toggleMuteApp: () => void;
   toggleCollapseMenu: () => void;
-  toggleWorkspaceDrawer: () => void;
   openSettings: (args: { path: string }) => void;
   openDownloads: (args: { path: string }) => void;
   // eslint-disable-next-line react/no-unused-prop-types
@@ -151,8 +139,6 @@ class Sidebar extends Component<IProps, IState> {
       toggleMuteApp,
       toggleCollapseMenu,
       isAppMuted,
-      isWorkspaceDrawerOpen,
-      toggleWorkspaceDrawer,
       stores,
       actions,
       isTodosServiceActive,
@@ -160,7 +146,6 @@ class Sidebar extends Component<IProps, IState> {
     const {
       hideCollapseButton,
       hideRecipesButton,
-      hideWorkspacesButton,
       hideNotificationsButton,
       hideSettingsButton,
       hideDownloadButton,
@@ -173,13 +158,8 @@ class Sidebar extends Component<IProps, IState> {
       ? messages.closeTodosDrawer
       : messages.openTodosDrawer;
 
-    const workspaceToggleMessage = isWorkspaceDrawerOpen
-      ? messages.closeWorkspaceDrawer
-      : messages.openWorkspaceDrawer;
-
     const numberActiveButtons = [
       !hideRecipesButton,
-      !hideWorkspacesButton,
       !hideNotificationsButton,
       !hideSettingsButton,
       !hideSplitModeButton,
@@ -265,24 +245,6 @@ class Sidebar extends Component<IProps, IState> {
             )} (${splitModeToggleShortcutKey(false)})`}
           >
             <Icon icon={mdiViewSplitVertical} size={1.5} />
-          </button>
-        ) : null}
-        {!hideWorkspacesButton && !isMenuCollapsed ? (
-          <button
-            type="button"
-            onClick={() => {
-              toggleWorkspaceDrawer();
-              this.updateToolTip();
-            }}
-            className={`sidebar__button sidebar__button--workspaces ${
-              isWorkspaceDrawerOpen ? 'is-active' : ''
-            }`}
-            data-tooltip-id="tooltip-sidebar-button"
-            data-tooltip-content={`${intl.formatMessage(
-              workspaceToggleMessage,
-            )} (${workspaceToggleShortcutKey(false)})`}
-          >
-            <Icon icon={mdiViewGrid} size={1.5} />
           </button>
         ) : null}
         {!hideNotificationsButton && !isMenuCollapsed ? (
@@ -381,14 +343,11 @@ class Sidebar extends Component<IProps, IState> {
             )} (${settingsShortcutKey(false)})`}
           >
             <Icon icon={mdiCog} size={1.5} />
-            {stores!.settings.app.automaticUpdates &&
-              (stores!.app.updateStatus ===
-                stores!.app.updateStatusTypes.AVAILABLE ||
-                stores!.app.updateStatus ===
-                  stores!.app.updateStatusTypes.DOWNLOADED ||
-                this.props.showServicesUpdatedInfoBar) && (
-                <span className="update-available">•</span>
-              )}
+            {(stores!.app.updateStatus ===
+              stores!.app.updateStatusTypes.AVAILABLE ||
+              this.props.showServicesUpdatedInfoBar) && (
+              <span className="update-available">•</span>
+            )}
           </button>
         ) : null}
       </div>

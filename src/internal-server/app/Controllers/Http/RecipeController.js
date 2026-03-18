@@ -12,20 +12,55 @@ const { API_VERSION } = require('../../../../environment-remote');
 
 const RECIPES_URL = `${LIVE_FERDIUM_API}/${API_VERSION}/recipes`;
 
+// Only allow these service recipe IDs
+const ALLOWED_RECIPE_IDS = new Set([
+  'discord',
+  'android-messages',
+  'whatsapp',
+  'stoat',
+  'singularity-sales-platform',
+]);
+
+const filterAllowedRecipes = recipes =>
+  recipes.filter(r => ALLOWED_RECIPE_IDS.has(r.id));
+
+// Built-in recipes provided by this fork
+const BUILTIN_RECIPES = [
+  {
+    id: 'singularity-sales-platform',
+    name: 'Singularity Sales Platform',
+    icon: 'https://singularitysalesplatform.com/favicon.ico',
+    featured: false,
+    aliases: [],
+  },
+];
+
 class RecipeController {
   // List official and custom recipes
   async list({ response }) {
     const recipesUrlFetch = await fetch(RECIPES_URL);
-    const officialRecipes = convertToJSON(await recipesUrlFetch.text());
+    const officialRecipes = filterAllowedRecipes(
+      convertToJSON(await recipesUrlFetch.text()),
+    );
     const allRecipes = await Recipe.all();
     const customRecipesArray = allRecipes.rows;
-    const customRecipes = customRecipesArray.map(recipe => ({
-      id: recipe.recipeId,
-      name: recipe.name,
-      ...convertToJSON(recipe.data),
-    }));
+    const customRecipes = filterAllowedRecipes(
+      customRecipesArray.map(recipe => ({
+        id: recipe.recipeId,
+        name: recipe.name,
+        ...convertToJSON(recipe.data),
+      })),
+    );
 
-    const recipes = [...officialRecipes, ...customRecipes];
+    // Merge: built-in > official > custom (dedup by id, built-in takes precedence)
+    const seen = new Set();
+    const recipes = [...BUILTIN_RECIPES, ...officialRecipes, ...customRecipes].filter(
+      r => {
+        if (seen.has(r.id)) return false;
+        seen.add(r.id);
+        return true;
+      },
+    );
 
     return response.send(recipes);
   }
@@ -45,6 +80,11 @@ class RecipeController {
     }
 
     const needle = request.input('needle');
+
+    // Include built-in recipes that match the search needle
+    const builtinMatches = BUILTIN_RECIPES.filter(
+      r => needle === 'ferdium:custom' || r.name.toLowerCase().includes(needle.toLowerCase()),
+    );
 
     // Get results
     let results;
@@ -84,7 +124,14 @@ class RecipeController {
       results = [...localResults, ...(remoteResults || [])];
     }
 
-    return response.send(results);
+    // Merge built-in matches (dedup by id)
+    const seen = new Set(results.map(r => r.id));
+    const merged = [
+      ...results,
+      ...builtinMatches.filter(r => !seen.has(r.id)),
+    ];
+
+    return response.send(filterAllowedRecipes(merged));
   }
 
   // Return an empty array
@@ -94,7 +141,9 @@ class RecipeController {
 
   async popularRecipes({ response }) {
     const recipesUrlFetch = await fetch(`${RECIPES_URL}/popular`);
-    const featuredRecipes = convertToJSON(await recipesUrlFetch.text());
+    const featuredRecipes = filterAllowedRecipes(
+      convertToJSON(await recipesUrlFetch.text()),
+    );
     return response.send(featuredRecipes);
   }
 
@@ -113,6 +162,14 @@ class RecipeController {
     }
 
     const service = params.recipe;
+
+    // Only allow downloading recipes from the allowed list
+    if (!ALLOWED_RECIPE_IDS.has(service)) {
+      return response.status(403).send({
+        message: 'Recipe not allowed',
+        code: 'recipe-not-allowed',
+      });
+    }
 
     // Check for invalid characters
     if (/\.+/.test(service) || /\/+/.test(service)) {

@@ -5,67 +5,49 @@ import type { MouseEventHandler } from 'react';
 import InfoBar from './ui/InfoBar';
 import Icon from './ui/icon';
 
-import { isSnap, isWinPortable } from '../environment';
-import { onAuthGoToReleaseNotes } from '../helpers/update-helpers';
-
 const messages = defineMessages({
   updateAvailable: {
     id: 'infobar.updateAvailable',
-    defaultMessage: 'A new update for Ferdium is available.',
+    defaultMessage:
+      'A newer version ({version}) of this app is available. Please visit the releases page to update.',
   },
-  changelog: {
-    id: 'infobar.buttonChangelog',
-    defaultMessage: 'What is new?',
-  },
-  buttonInstallUpdate: {
-    id: 'infobar.buttonInstallUpdate',
-    defaultMessage: 'Restart & install update',
-  },
-  isSnapMessage: {
-    id: 'infobar.isSnapMessage',
-    defaultMessage: 'Please update via Snap Store.',
+  viewReleases: {
+    id: 'infobar.buttonViewReleases',
+    defaultMessage: 'View Releases',
   },
 });
+
+const RELEASES_URL =
+  'https://github.com/Endlesszombiez/ferdium-singularity/releases';
 
 export interface IProps {
   onInstallUpdate: MouseEventHandler<HTMLButtonElement>;
   onHide: () => void;
   updateVersionParsed: string;
+  updateVersion?: string;
 }
 
 const AppUpdateInfoBar = (props: IProps) => {
-  const { onInstallUpdate, updateVersionParsed, onHide } = props;
+  const { onHide, updateVersion } = props;
   const intl = useIntl();
 
   return (
-    <InfoBar
-      type="primary"
-      ctaLabel={
-        isSnap ? undefined : intl.formatMessage(messages.buttonInstallUpdate)
-      }
-      onClick={event => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        !isWinPortable && !isSnap && onInstallUpdate(event);
-      }}
-      onHide={onHide}
-    >
+    <InfoBar type="primary" onHide={onHide}>
       <Icon icon={mdiInformation} />
       <p style={{ padding: '0 0.5rem 0 1rem' }}>
-        {intl.formatMessage(messages.updateAvailable)}
-        {isSnap && ` ${intl.formatMessage(messages.isSnapMessage)}`}
+        {intl.formatMessage(messages.updateAvailable, {
+          version: updateVersion || '',
+        })}
       </p>
 
       <button
         className="info-bar__inline-button"
         type="button"
         onClick={() => {
-          window.location.href = onAuthGoToReleaseNotes(
-            window.location.href,
-            updateVersionParsed,
-          );
+          window.open(RELEASES_URL, '_blank');
         }}
       >
-        <u>{intl.formatMessage(messages.changelog)}</u>
+        <u>{intl.formatMessage(messages.viewReleases)}</u>
       </button>
     </InfoBar>
   );
