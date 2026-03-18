@@ -21,6 +21,7 @@
     - [Clone repository with submodule](#clone-repository-with-submodule)
     - [Run the script](#run-the-script)
     - [Using Docker to build a linux-targetted packaged app (not supported as a 1st-class citizen)](#using-docker-to-build-a-linux-targetted-packaged-app-not-supported-as-a-1st-class-citizen)
+    - [Recommended IDE (JetBrains WebStorm)](#recommended-ide-jetbrains-webstorm)
     - [Start development app](#start-development-app)
     - [Styleguide](#styleguide)
       - [Git Commit Messages format](#git-commit-messages-format)
@@ -140,6 +141,22 @@ mv /ferdium/ferdium-*.freebsd /ferdium-out/Ferdium-$GIT_SHA.freebsd
 mv /ferdium/ferdium /ferdium-out/Ferdium-$GIT_SHA
 mv /ferdium/latest-linux.yml /ferdium-out/latest-linux-$GIT_SHA.yml
 ```
+
+### Recommended IDE (JetBrains WebStorm)
+
+For this project we recommend using [WebStorm](https://www.jetbrains.com/webstorm/) from JetBrains.
+
+Ferdium is a **TypeScript / JavaScript Electron** application, and WebStorm is JetBrains' dedicated IDE for exactly this kind of project. It provides first-class support for:
+
+- TypeScript (inline type-checking, refactoring, auto-imports)
+- React / JSX (used throughout the UI layer)
+- Node.js and Electron
+- ESLint and Prettier (configured via `.eslintrc.js` / `.prettierrc.js`)
+- pnpm workspaces
+
+A shared WebStorm project configuration is included in the `.idea/` directory at the root of the repository. Simply open the repository root in WebStorm and it will detect the project settings automatically.
+
+> **Note:** If you already have another JetBrains IDE (e.g. IntelliJ IDEA Ultimate), you can also open and work on this project there — the included `.idea/` configuration is compatible with all recent JetBrains IDEs. However, WebStorm is the primary recommended tool.
 
 ### Start development app
 
