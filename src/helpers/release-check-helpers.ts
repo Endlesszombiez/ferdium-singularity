@@ -4,6 +4,8 @@ import semver from 'semver';
 const REPO_OWNER = 'Endlesszombiez';
 const REPO_NAME = 'ferdium-singularity';
 
+const octokit = new Octokit();
+
 /**
  * Fetches the latest release tag from the Endlesszombiez/ferdium-singularity
  * GitHub repository and compares it with the currently installed version.
@@ -14,7 +16,6 @@ export async function checkForNewerRelease(
   installedVersion: string,
 ): Promise<string | null> {
   try {
-    const octokit = new Octokit();
     const response = await octokit.request(
       'GET /repos/{owner}/{repo}/releases/latest',
       {

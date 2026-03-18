@@ -438,9 +438,44 @@ export default class ServerApi {
     const recipeTempDirectory = join(recipesDirectory, 'temp', recipeId);
     const tempArchivePath = join(recipeTempDirectory, 'recipe.tar.gz');
 
-    const internalRecipeFile = asarRecipesPath(`${recipeId}.tar.gz`);
-
     ensureDirSync(recipeTempDirectory);
+
+    // Handle locally-defined recipes (not from the submodule or remote server)
+    if (recipeId === 'singularity-sales-platform') {
+      debug('[ServerApi::getRecipePackage] Building built-in singularity-sales-platform recipe');
+      const recipeDir = join(recipesDirectory, 'singularity-sales-platform');
+      ensureDirSync(recipeDir);
+      writeFileSync(
+        join(recipeDir, 'package.json'),
+        JSON.stringify({
+          id: 'singularity-sales-platform',
+          name: 'Singularity Sales Platform',
+          version: '1.0.0',
+          description: 'Singularity Sales Platform',
+          main: 'index.js',
+          author: 'Endlesszombiez',
+          license: 'MIT',
+          config: {
+            serviceURL: 'https://singularitysalesplatform.com',
+          },
+        }),
+      );
+      writeFileSync(
+        join(recipeDir, 'index.js'),
+        `module.exports = Ferdium => {
+  class SingularitySalesPlatform extends Ferdium {
+    async validateUrl(url) {
+      return /^https?:\\/\\/(www\\.)?singularitysalesplatform\\.com/.test(url);
+    }
+  }
+  return SingularitySalesPlatform;
+};\n`,
+      );
+      removeSync(recipeTempDirectory);
+      return 'singularity-sales-platform';
+    }
+
+    const internalRecipeFile = asarRecipesPath(`${recipeId}.tar.gz`);
 
     let archivePath: PathOrFileDescriptor;
 

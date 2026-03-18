@@ -81,7 +81,9 @@ class RecipeController {
 
     const needle = request.input('needle');
 
-    // Include built-in recipes that match the search needle
+    // Include built-in recipes that match the search needle.
+    // When 'ferdium:custom' is used as the needle, all built-in recipes are
+    // included so the user can find them in the "Your services" view.
     const builtinMatches = BUILTIN_RECIPES.filter(
       r => needle === 'ferdium:custom' || r.name.toLowerCase().includes(needle.toLowerCase()),
     );
