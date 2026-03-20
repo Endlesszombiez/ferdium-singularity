@@ -199,15 +199,14 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
                       {intl.formatMessage(messages.servicesUpdated)}
                     </InfoBar>
                   )}
-                {isUpdateAvailable &&
-                  this.state.shouldShowAppUpdateInfoBar && (
-                    <AppUpdateInfoBar
-                      updateVersion={updateVersion}
-                      onHide={() => {
-                        this.setState({ shouldShowAppUpdateInfoBar: false });
-                      }}
-                    />
-                  )}
+                {isUpdateAvailable && this.state.shouldShowAppUpdateInfoBar && (
+                  <AppUpdateInfoBar
+                    updateVersion={updateVersion}
+                    onHide={() => {
+                      this.setState({ shouldShowAppUpdateInfoBar: false });
+                    }}
+                  />
+                )}
                 <BasicAuth />
                 <QuickSwitch />
                 <PublishDebugInfo />

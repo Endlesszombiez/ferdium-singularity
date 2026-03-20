@@ -1,5 +1,5 @@
 import { systemPreferences } from '@electron/remote';
-import { mdiGithub, mdiOpenInNew, mdiPowerPlug } from '@mdi/js';
+import { mdiGithub, mdiOpenInNew } from '@mdi/js';
 import { ipcRenderer } from 'electron';
 import { noop } from 'lodash';
 import { observer } from 'mobx-react';
@@ -22,8 +22,6 @@ import {
 } from '../../../config';
 import {
   isMac,
-  isSnap,
-  isWinPortable,
   isWindows,
   lockFerdiumShortcutKey,
 } from '../../../environment';
@@ -619,8 +617,8 @@ class EditSettingsForm extends Component<IProps, IState> {
               >
                 {intl.formatMessage(messages.headlineUpdates)}
                 {(isUpdateAvailable || showServicesUpdatedInfoBar) && (
-                    <span className="update-available">•</span>
-                  )}
+                  <span className="update-available">•</span>
+                )}
               </H5>
             </div>
 
@@ -1288,28 +1286,23 @@ class EditSettingsForm extends Component<IProps, IState> {
                 </H2>
 
                 <p>
-                  {intl.formatMessage(messages.currentVersion)}{' '}
-                  {ferdiumVersion}
+                  {intl.formatMessage(messages.currentVersion)} {ferdiumVersion}
                 </p>
                 {isUpdateAvailable ? (
-                  <>
-                    <Infobox type="warning" icon="alert">
-                      A newer version ({updateVersion}) is available.{' '}
-                      <a
-                        href="https://github.com/Endlesszombiez/ferdium-singularity/releases"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="link"
-                      >
-                        View releases
-                      </a>{' '}
-                      to update.
-                    </Infobox>
-                  </>
+                  <Infobox type="warning" icon="alert">
+                    A newer version ({updateVersion}) is available.{' '}
+                    <a
+                      href="https://github.com/Endlesszombiez/ferdium-singularity/releases"
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="link"
+                    >
+                      View releases
+                    </a>{' '}
+                    to update.
+                  </Infobox>
                 ) : (
-                  <p>
-                    {intl.formatMessage(messages.updateStatusUpToDate)}.
-                  </p>
+                  <p>{intl.formatMessage(messages.updateStatusUpToDate)}.</p>
                 )}
                 <p className="settings__message">
                   <Icon icon={mdiGithub} /> Ferdium is based on{' '}
