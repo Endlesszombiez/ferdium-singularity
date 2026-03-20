@@ -442,7 +442,9 @@ export default class ServerApi {
 
     // Handle locally-defined recipes (not from the submodule or remote server)
     if (recipeId === 'singularity-sales-platform') {
-      debug('[ServerApi::getRecipePackage] Building built-in singularity-sales-platform recipe');
+      debug(
+        '[ServerApi::getRecipePackage] Building built-in singularity-sales-platform recipe',
+      );
       const recipeDir = join(recipesDirectory, 'singularity-sales-platform');
       ensureDirSync(recipeDir);
       writeFileSync(

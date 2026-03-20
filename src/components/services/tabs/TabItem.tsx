@@ -330,8 +330,9 @@ class TabItem extends Component<IProps, IState> {
         click: () => clearCache(),
         enabled: service.isEnabled,
       },
-      ...(service.recipe.id !== 'discord'
-        ? [
+      ...(service.recipe.id === 'discord'
+        ? []
+        : [
             {
               type: 'separator' as const,
             },
@@ -355,8 +356,7 @@ class TabItem extends Component<IProps, IState> {
                 }
               },
             },
-          ]
-        : []),
+          ]),
     ];
     const menu = Menu.buildFromTemplate(menuTemplate);
 

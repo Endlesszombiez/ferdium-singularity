@@ -13,7 +13,6 @@ import { serverName } from '../../api/apiBase';
 import { GITHUB_FERDIUM_URL } from '../../config';
 import { isWindows } from '../../environment';
 import { Component as PublishDebugInfo } from '../../features/publishDebugInfo';
-import { updateVersionParse } from '../../helpers/update-helpers';
 import globalMessages from '../../i18n/globalMessages';
 import AppUpdateInfoBar from '../AppUpdateInfoBar';
 import InfoBar from '../ui/InfoBar';
@@ -28,7 +27,6 @@ export interface IProps extends WrappedComponentProps {
   retryHealthCheck: MouseEventHandler<HTMLButtonElement>;
   isHealthCheckLoading: boolean;
   isFullScreen: boolean;
-  installAppUpdate: MouseEventHandler<HTMLButtonElement>;
   updateVersion: string;
   isUpdateAvailable: boolean;
 }
@@ -56,7 +54,6 @@ class AuthLayout extends Component<IProps, IState> {
       retryHealthCheck,
       isHealthCheckLoading,
       isFullScreen,
-      installAppUpdate,
       updateVersion,
       intl,
       isUpdateAvailable,
@@ -84,8 +81,6 @@ class AuthLayout extends Component<IProps, IState> {
           {isUpdateAvailable &&
             this.state.shouldShowAppUpdateInfoBar && (
               <AppUpdateInfoBar
-                onInstallUpdate={installAppUpdate}
-                updateVersionParsed={updateVersionParse(updateVersion)}
                 updateVersion={updateVersion}
                 onHide={() => {
                   this.setState({ shouldShowAppUpdateInfoBar: false });

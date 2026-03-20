@@ -1,7 +1,6 @@
 import { defineMessages, useIntl } from 'react-intl';
 
 import { mdiInformation } from '@mdi/js';
-import type { MouseEventHandler } from 'react';
 import InfoBar from './ui/InfoBar';
 import Icon from './ui/icon';
 
@@ -21,9 +20,7 @@ const RELEASES_URL =
   'https://github.com/Endlesszombiez/ferdium-singularity/releases';
 
 export interface IProps {
-  onInstallUpdate: MouseEventHandler<HTMLButtonElement>;
   onHide: () => void;
-  updateVersionParsed: string;
   updateVersion?: string;
 }
 

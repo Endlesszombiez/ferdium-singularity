@@ -15,7 +15,6 @@ import { Outlet } from 'react-router-dom';
 import { Component as BasicAuth } from '../../features/basicAuth';
 import { Component as PublishDebugInfo } from '../../features/publishDebugInfo';
 import { Component as QuickSwitch } from '../../features/quickSwitch';
-import { updateVersionParse } from '../../helpers/update-helpers';
 import InfoBar from '../ui/InfoBar';
 import ErrorBoundary from '../util/ErrorBoundary';
 
@@ -88,7 +87,6 @@ interface IProps extends WrappedComponentProps, WithStylesProps<typeof styles> {
   services: React.ReactElement;
   showServicesUpdatedInfoBar: boolean;
   authRequestFailed: boolean;
-  installAppUpdate: () => void;
   showRequiredRequestsError: boolean;
   areRequiredRequestsSuccessful: boolean;
   retryRequiredRequests: () => void;
@@ -120,7 +118,6 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
       services,
       showServicesUpdatedInfoBar,
       authRequestFailed,
-      installAppUpdate,
       settings,
       showRequiredRequestsError,
       areRequiredRequestsSuccessful,
@@ -205,8 +202,6 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
                 {isUpdateAvailable &&
                   this.state.shouldShowAppUpdateInfoBar && (
                     <AppUpdateInfoBar
-                      onInstallUpdate={installAppUpdate}
-                      updateVersionParsed={updateVersionParse(updateVersion)}
                       updateVersion={updateVersion}
                       onHide={() => {
                         this.setState({ shouldShowAppUpdateInfoBar: false });
