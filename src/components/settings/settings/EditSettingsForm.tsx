@@ -20,11 +20,7 @@ import {
   SPLIT_COLUMNS_MAX,
   SPLIT_COLUMNS_MIN,
 } from '../../../config';
-import {
-  isMac,
-  isWindows,
-  lockFerdiumShortcutKey,
-} from '../../../environment';
+import { isMac, isWindows, lockFerdiumShortcutKey } from '../../../environment';
 import {
   ferdiumVersion,
   userDataCertsPath,
