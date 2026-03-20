@@ -11,7 +11,7 @@ import {
 import { type WrappedComponentProps, injectIntl } from 'react-intl';
 import { serverName } from '../../api/apiBase';
 import { GITHUB_FERDIUM_URL } from '../../config';
-import { isSnap, isWindows } from '../../environment';
+import { isWindows } from '../../environment';
 import { Component as PublishDebugInfo } from '../../features/publishDebugInfo';
 import { updateVersionParse } from '../../helpers/update-helpers';
 import globalMessages from '../../i18n/globalMessages';
@@ -29,7 +29,6 @@ export interface IProps extends WrappedComponentProps {
   isHealthCheckLoading: boolean;
   isFullScreen: boolean;
   installAppUpdate: MouseEventHandler<HTMLButtonElement>;
-  appUpdateIsDownloaded: boolean;
   updateVersion: string;
   isUpdateAvailable: boolean;
 }
@@ -58,7 +57,6 @@ class AuthLayout extends Component<IProps, IState> {
       isHealthCheckLoading,
       isFullScreen,
       installAppUpdate,
-      appUpdateIsDownloaded,
       updateVersion,
       intl,
       isUpdateAvailable,
@@ -83,11 +81,12 @@ class AuthLayout extends Component<IProps, IState> {
               {intl.formatMessage(globalMessages.notConnectedToTheInternet)}
             </InfoBar>
           )}
-          {(appUpdateIsDownloaded || (isSnap && isUpdateAvailable)) &&
+          {isUpdateAvailable &&
             this.state.shouldShowAppUpdateInfoBar && (
               <AppUpdateInfoBar
                 onInstallUpdate={installAppUpdate}
                 updateVersionParsed={updateVersionParse(updateVersion)}
+                updateVersion={updateVersion}
                 onHide={() => {
                   this.setState({ shouldShowAppUpdateInfoBar: false });
                 }}

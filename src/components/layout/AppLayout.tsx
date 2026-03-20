@@ -19,7 +19,7 @@ import { updateVersionParse } from '../../helpers/update-helpers';
 import InfoBar from '../ui/InfoBar';
 import ErrorBoundary from '../util/ErrorBoundary';
 
-import { isMac, isSnap, isWindows } from '../../environment';
+import { isMac, isWindows } from '../../environment';
 import Todos from '../../features/todos/containers/TodosScreen';
 import { workspaceStore } from '../../features/workspaces';
 import WorkspaceSwitchingIndicator from '../../features/workspaces/components/WorkspaceSwitchingIndicator';
@@ -87,7 +87,6 @@ interface IProps extends WrappedComponentProps, WithStylesProps<typeof styles> {
   workspacesDrawer: React.ReactElement;
   services: React.ReactElement;
   showServicesUpdatedInfoBar: boolean;
-  appUpdateIsDownloaded: boolean;
   authRequestFailed: boolean;
   installAppUpdate: () => void;
   showRequiredRequestsError: boolean;
@@ -120,7 +119,6 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
       sidebar,
       services,
       showServicesUpdatedInfoBar,
-      appUpdateIsDownloaded,
       authRequestFailed,
       installAppUpdate,
       settings,
@@ -134,7 +132,7 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
 
     const { intl } = this.props;
 
-    const { locked, automaticUpdates } = settings.app;
+    const { locked } = settings.app;
     if (locked) {
       return <LockedScreen />;
     }
@@ -186,8 +184,7 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
                     {intl.formatMessage(messages.authRequestFailed)}
                   </InfoBar>
                 )}
-                {automaticUpdates &&
-                  showServicesUpdatedInfoBar &&
+                {showServicesUpdatedInfoBar &&
                   this.state.shouldShowServicesUpdatedInfoBar && (
                     <InfoBar
                       type="primary"
@@ -205,12 +202,12 @@ class AppLayout extends Component<PropsWithChildren<IProps>, IState> {
                       {intl.formatMessage(messages.servicesUpdated)}
                     </InfoBar>
                   )}
-                {automaticUpdates &&
-                  (appUpdateIsDownloaded || (isSnap && isUpdateAvailable)) &&
+                {isUpdateAvailable &&
                   this.state.shouldShowAppUpdateInfoBar && (
                     <AppUpdateInfoBar
                       onInstallUpdate={installAppUpdate}
                       updateVersionParsed={updateVersionParse(updateVersion)}
+                      updateVersion={updateVersion}
                       onHide={() => {
                         this.setState({ shouldShowAppUpdateInfoBar: false });
                       }}

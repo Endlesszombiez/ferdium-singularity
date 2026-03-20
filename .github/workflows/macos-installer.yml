@@ -1,0 +1,122 @@
+name: macOS Installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag, or SHA to build
+        required: false
+        default: ''
+      run_tests:
+        description: Run lint and tests before packaging
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-installer-${{ github.event.inputs.ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build_macos_arm64:
+    name: Build macOS Apple Silicon installer
+    runs-on: macos-14
+    env:
+      NPM_CACHE: ${{ github.workspace }}/.npm
+      ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+      ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+    steps:
+      - name: Resolve ref to checkout
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.ref }}" ]; then
+            echo "CHECKOUT_REF=${{ github.event.inputs.ref }}" >> "$GITHUB_ENV"
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('./pnpm-lock.yaml', './recipes/pnpm-lock.yaml') }}
+          path: |
+            ~/Library/pnpm/store
+            ${{ env.NPM_CACHE }}
+
+      - name: Cache Electron downloads
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-electron-${{ hashFiles('./pnpm-lock.yaml') }}
+          path: ${{ env.ELECTRON_CACHE }}
+
+      - name: Cache electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-electron-builder-${{ hashFiles('./pnpm-lock.yaml') }}
+          path: ${{ env.ELECTRON_BUILDER_CACHE }}
+
+      - name: Install app dependencies
+        uses: nick-fields/retry@v3
+        with:
+          command: pnpm install --frozen-lockfile
+          timeout_minutes: 20
+          max_attempts: 3
+          retry_on: error
+
+      - name: Install recipe dependencies
+        uses: nick-fields/retry@v3
+        with:
+          command: pnpm install --frozen-lockfile
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          working_directory: ./recipes
+
+      - name: Package recipes
+        working-directory: ./recipes
+        run: pnpm package
+
+      - name: Run lint
+        if: ${{ github.event.inputs.run_tests == 'true' }}
+        run: pnpm lint
+
+      - name: Run tests
+        if: ${{ github.event.inputs.run_tests == 'true' }}
+        run: pnpm test
+
+      - name: Build macOS arm64 artifacts
+        shell: bash
+        run: |
+          pnpm exec preval-build-info-cli
+          node esbuild.mjs
+          pnpm exec electron-builder --mac dmg zip --arm64 --publish never
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ferdium-macos-arm64-${{ github.run_number }}
+          path: |
+            out/*.dmg
+            out/*.zip
+            out/latest-mac.yml
+          if-no-files-found: error
+          retention-days: 14

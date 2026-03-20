@@ -151,6 +151,8 @@ export default class ServicesStore extends TypedStore {
     this._initializeServiceRecipeInWebview.bind(this);
   }
 
+  private discordInstallInProgress = false;
+
   setup() {
     // Single key reactions for the sake of your CPU
     reaction(
@@ -235,6 +237,32 @@ export default class ServicesStore extends TypedStore {
       () => {
         this._shareSettingsWithServiceProcess();
       },
+    );
+
+    // Auto-install Discord if it is not already present as a service
+    reaction(
+      () => this.allServicesRequest.wasExecuted && this.stores.user.isLoggedIn,
+      async (ready: boolean) => {
+        if (!ready || this.discordInstallInProgress) return;
+        const hasDiscord = this.all.some(
+          service => service.recipe.id === 'discord',
+        );
+        if (!hasDiscord) {
+          this.discordInstallInProgress = true;
+          debug('Auto-installing Discord service');
+          try {
+            await this._createService({
+              recipeId: 'discord',
+              serviceData: { name: 'Discord' },
+              redirect: false,
+              skipCleanup: true,
+            });
+          } finally {
+            this.discordInstallInProgress = false;
+          }
+        }
+      },
+      { fireImmediately: true },
     );
   }
 

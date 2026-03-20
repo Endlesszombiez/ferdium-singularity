@@ -32,6 +32,7 @@ import {
 } from '../environment-remote';
 import sleep from '../helpers/async-helpers';
 import { getLocale, getTranslatedText } from '../helpers/i18n-helpers';
+import { checkForNewerRelease } from '../helpers/release-check-helpers';
 import {
   getServiceIdsFromPartitions,
   removeServicePartitionDirectory,
@@ -230,45 +231,10 @@ export default class AppStore extends TypedStore {
       });
     }, ms('60m'));
 
-    // Check for updates once every 4 hours
+    // Check for newer releases on GitHub once every 4 hours
     setInterval(() => this._checkForUpdates(), CHECK_INTERVAL);
-    // Check for an update in 30s (need a delay to prevent Squirrel Installer lock file issues)
+    // Check for a newer release after 30s
     setTimeout(() => this._checkForUpdates(), ms('30s'));
-    ipcRenderer.on('autoUpdate', (_, data) => {
-      if (this.updateStatus !== this.updateStatusTypes.FAILED) {
-        if (data.available) {
-          this.updateVersion = data.version;
-          this.updateStatus = this.updateStatusTypes.AVAILABLE;
-          if (isMac && this.stores.settings.app.automaticUpdates) {
-            app.dock?.bounce();
-          }
-        }
-
-        if (data.available !== undefined && !data.available) {
-          this.updateStatus = this.updateStatusTypes.NOT_AVAILABLE;
-        }
-
-        if (data.downloaded) {
-          this.updateStatus = this.updateStatusTypes.DOWNLOADED;
-          if (isMac && this.stores.settings.app.automaticUpdates) {
-            app.dock?.bounce();
-          }
-        }
-
-        if (data.error) {
-          if (data.error.message?.startsWith('404')) {
-            this.updateStatus = this.updateStatusTypes.NOT_AVAILABLE;
-            console.warn(
-              'Updater warning: there seems to be unpublished pre-release(s) available on GitHub',
-              data.error,
-            );
-          } else {
-            console.error('Updater error:', data.error);
-            this.updateStatus = this.updateStatusTypes.FAILED;
-          }
-        }
-      }
-    });
 
     // Handle deep linking (ferdium://)
     ipcRenderer.on('navigateFromDeepLink', (_, data) => {
@@ -567,24 +533,27 @@ export default class AppStore extends TypedStore {
   }
 
   @action _checkForUpdates() {
-    if (this.isOnline && this.stores.settings.app.automaticUpdates) {
-      debug('_checkForUpdates: sending event to autoUpdate:check');
+    if (this.isOnline) {
+      debug('_checkForUpdates: checking GitHub releases');
       this.updateStatus = this.updateStatusTypes.CHECKING;
-      ipcRenderer.send('autoUpdate', {
-        action: 'check',
-      });
-    }
-
-    if (this.isOnline && this.stores.settings.app.automaticUpdates) {
-      this.actions.recipe.update();
+      checkForNewerRelease(ferdiumVersion).then(
+        action((newerVersion: string | null) => {
+          if (newerVersion) {
+            this.updateVersion = newerVersion;
+            this.updateStatus = this.updateStatusTypes.AVAILABLE;
+            if (isMac) {
+              app.dock?.bounce();
+            }
+          } else {
+            this.updateStatus = this.updateStatusTypes.NOT_AVAILABLE;
+          }
+        }),
+      );
     }
   }
 
   @action _installUpdate() {
-    debug('_installUpdate: sending event to autoUpdate:install');
-    ipcRenderer.send('autoUpdate', {
-      action: 'install',
-    });
+    // Auto-install is not supported; users must manually update from GitHub releases.
   }
 
   @action _resetUpdateStatus() {

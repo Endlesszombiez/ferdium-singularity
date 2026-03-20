@@ -14,8 +14,6 @@ import Sidebar from '../../components/layout/Sidebar';
 import Services from '../../components/services/content/Services';
 import AppLoader from '../../components/ui/AppLoader';
 import { DEFAULT_ACCENT_COLOR } from '../../config';
-import { workspaceStore } from '../../features/workspaces';
-import WorkspaceDrawer from '../../features/workspaces/components/WorkspaceDrawer';
 
 interface IProps extends StoresProps {}
 
@@ -106,17 +104,7 @@ class AppLayoutContainer extends Component<IProps> {
       );
     }
 
-    const workspacesDrawer = (
-      <WorkspaceDrawer
-        getServicesForWorkspace={workspace =>
-          workspace
-            ? workspaceStore.getWorkspaceServices(workspace).map(s => s.name)
-            : services.all.map(s => s.name)
-        }
-        stores={this.props.stores}
-        actions={this.props.actions}
-      />
-    );
+    const workspacesDrawer = null;
 
     const sidebar = (
       <Sidebar
@@ -139,10 +127,6 @@ class AppLayoutContainer extends Component<IProps> {
         wakeUpService={awake}
         toggleMuteApp={toggleMuteApp}
         toggleCollapseMenu={toggleCollapseMenu}
-        toggleWorkspaceDrawer={
-          this.props.actions.workspaces.toggleWorkspaceDrawer
-        }
-        isWorkspaceDrawerOpen={workspaceStore.isWorkspaceDrawerOpen}
         showServicesUpdatedInfoBar={ui.showServicesUpdatedInfoBar}
         showMessageBadgeWhenMutedSetting={
           settings.all.app.showMessageBadgeWhenMuted
@@ -178,9 +162,6 @@ class AppLayoutContainer extends Component<IProps> {
             settings={settings}
             isFullScreen={app.isFullScreen}
             showServicesUpdatedInfoBar={ui.showServicesUpdatedInfoBar}
-            appUpdateIsDownloaded={
-              app.updateStatus === app.updateStatusTypes.DOWNLOADED
-            }
             authRequestFailed={app.authRequestFailed}
             sidebar={sidebar}
             workspacesDrawer={workspacesDrawer}

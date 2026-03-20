@@ -330,29 +330,33 @@ class TabItem extends Component<IProps, IState> {
         click: () => clearCache(),
         enabled: service.isEnabled,
       },
-      {
-        type: 'separator',
-      },
-      {
-        label: intl.formatMessage(messages.deleteService),
-        click: () => {
-          // @ts-expect-error Fix me
-          const selection = dialog.showMessageBoxSync(app.mainWindow, {
-            type: 'question',
-            message: intl.formatMessage(messages.deleteService),
-            detail: intl.formatMessage(messages.confirmDeleteService, {
-              serviceName: service.name || service.recipe.name,
-            }),
-            buttons: [
-              intl.formatMessage(globalMessages.yes),
-              intl.formatMessage(globalMessages.no),
-            ],
-          });
-          if (selection === 0) {
-            deleteService();
-          }
-        },
-      },
+      ...(service.recipe.id !== 'discord'
+        ? [
+            {
+              type: 'separator' as const,
+            },
+            {
+              label: intl.formatMessage(messages.deleteService),
+              click: () => {
+                // @ts-expect-error Fix me
+                const selection = dialog.showMessageBoxSync(app.mainWindow, {
+                  type: 'question',
+                  message: intl.formatMessage(messages.deleteService),
+                  detail: intl.formatMessage(messages.confirmDeleteService, {
+                    serviceName: service.name || service.recipe.name,
+                  }),
+                  buttons: [
+                    intl.formatMessage(globalMessages.yes),
+                    intl.formatMessage(globalMessages.no),
+                  ],
+                });
+                if (selection === 0) {
+                  deleteService();
+                }
+              },
+            },
+          ]
+        : []),
     ];
     const menu = Menu.buildFromTemplate(menuTemplate);
 

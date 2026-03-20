@@ -600,7 +600,7 @@ export const DEFAULT_APP_SETTINGS = {
   searchEngine: SEARCH_ENGINE_STARTPAGE,
   translatorLanguage: 'en',
   translatorEngine: TRANSLATOR_ENGINE_LIBRETRANSLATE,
-  useHorizontalStyle: false,
+  useHorizontalStyle: true,
   hideCollapseButton: false,
   isMenuCollapsed: false,
   hideRecipesButton: false,

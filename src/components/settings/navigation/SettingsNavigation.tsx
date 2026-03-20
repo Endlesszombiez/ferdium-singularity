@@ -158,14 +158,11 @@ class SettingsNavigation extends Component<IProps> {
           }
         >
           {intl.formatMessage(globalMessages.settings)}
-          {stores!.settings.app.automaticUpdates &&
-            (stores!.ui.showServicesUpdatedInfoBar ||
-              stores!.app.updateStatus ===
-                stores!.app.updateStatusTypes.AVAILABLE ||
-              stores!.app.updateStatus ===
-                stores!.app.updateStatusTypes.DOWNLOADED) && (
-              <span className="update-available">•</span>
-            )}
+          {(stores!.ui.showServicesUpdatedInfoBar ||
+            stores!.app.updateStatus ===
+              stores!.app.updateStatusTypes.AVAILABLE) && (
+            <span className="update-available">•</span>
+          )}
         </NavLink>
         <NavLink
           to="/settings/releasenotes"
