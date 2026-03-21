@@ -40,7 +40,6 @@ import { ifUndefined } from './jsUtils';
 import Settings from './electron/Settings';
 import handleDeepLink from './electron/deepLinking';
 import './electron/exception';
-// eslint-disable-next-line import/no-cycle
 import ipcApi from './electron/ipc-api';
 import isPositionValid from './electron/windowUtils';
 import { mainIpcHandler as basicAuthHandler } from './features/basicAuth';

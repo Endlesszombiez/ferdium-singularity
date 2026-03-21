@@ -78,15 +78,14 @@ class AuthLayout extends Component<IProps, IState> {
               {intl.formatMessage(globalMessages.notConnectedToTheInternet)}
             </InfoBar>
           )}
-          {isUpdateAvailable &&
-            this.state.shouldShowAppUpdateInfoBar && (
-              <AppUpdateInfoBar
-                updateVersion={updateVersion}
-                onHide={() => {
-                  this.setState({ shouldShowAppUpdateInfoBar: false });
-                }}
-              />
-            )}
+          {isUpdateAvailable && this.state.shouldShowAppUpdateInfoBar && (
+            <AppUpdateInfoBar
+              updateVersion={updateVersion}
+              onHide={() => {
+                this.setState({ shouldShowAppUpdateInfoBar: false });
+              }}
+            />
+          )}
           {isOnline && !isAPIHealthy && (
             <InfoBar
               type="danger"

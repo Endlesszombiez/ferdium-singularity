@@ -54,13 +54,15 @@ class RecipeController {
 
     // Merge: built-in > official > custom (dedup by id, built-in takes precedence)
     const seen = new Set();
-    const recipes = [...BUILTIN_RECIPES, ...officialRecipes, ...customRecipes].filter(
-      r => {
-        if (seen.has(r.id)) return false;
-        seen.add(r.id);
-        return true;
-      },
-    );
+    const recipes = [
+      ...BUILTIN_RECIPES,
+      ...officialRecipes,
+      ...customRecipes,
+    ].filter(r => {
+      if (seen.has(r.id)) return false;
+      seen.add(r.id);
+      return true;
+    });
 
     return response.send(recipes);
   }
@@ -85,7 +87,9 @@ class RecipeController {
     // When 'ferdium:custom' is used as the needle, all built-in recipes are
     // included so the user can find them in the "Your services" view.
     const builtinMatches = BUILTIN_RECIPES.filter(
-      r => needle === 'ferdium:custom' || r.name.toLowerCase().includes(needle.toLowerCase()),
+      r =>
+        needle === 'ferdium:custom' ||
+        r.name.toLowerCase().includes(needle.toLowerCase()),
     );
 
     // Get results
@@ -128,10 +132,7 @@ class RecipeController {
 
     // Merge built-in matches (dedup by id)
     const seen = new Set(results.map(r => r.id));
-    const merged = [
-      ...results,
-      ...builtinMatches.filter(r => !seen.has(r.id)),
-    ];
+    const merged = [...results, ...builtinMatches.filter(r => !seen.has(r.id))];
 
     return response.send(filterAllowedRecipes(merged));
   }

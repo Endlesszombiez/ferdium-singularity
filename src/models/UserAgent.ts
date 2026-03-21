@@ -6,10 +6,8 @@ import defaultUserAgent from '../helpers/userAgent-helpers';
 const debug = require('../preload-safe-debug')('Ferdium:UserAgent');
 
 export default class UserAgent {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _willNavigateListener = (_event: any): void => {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _didNavigateListener = (_event: any): void => {};
 
   @observable.ref webview: ElectronWebView = null;

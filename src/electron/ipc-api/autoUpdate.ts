@@ -8,7 +8,7 @@ export default (_params: { mainWindow: any; settings: any }) => {
   // checking the Endlesszombiez/ferdium-singularity GitHub releases page.
   // The ipcMain handler is kept as a no-op to avoid errors from any remaining
   // callers.
-  ipcMain.on('autoUpdate', (_event, _args) => {
+  ipcMain.on('autoUpdate', () => {
     debug('autoUpdate ipc message received but auto-update is disabled');
   });
 };
