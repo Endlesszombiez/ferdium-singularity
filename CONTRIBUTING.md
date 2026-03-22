@@ -117,6 +117,8 @@ Assets will be available in the `out` folder.
 
 If you encounter the `gyp: No Xcode or CLT version` error on macOS at this step, please have a look [here](https://medium.com/flawless-app-stories/gyp-no-xcode-or-clt-version-detected-macos-catalina-anansewaa-38b536389e8d).
 
+For a detailed, step-by-step guide on building installable packages for all platforms — including **macOS Apple Silicon (M1/M2/M3)**, Windows, and Linux — see [docs/BUILD.md](./docs/BUILD.md).
+
 ### Using Docker to build a linux-targetted packaged app (not supported as a 1st-class citizen)
 
 ```bash
