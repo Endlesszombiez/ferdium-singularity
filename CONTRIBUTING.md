@@ -56,14 +56,14 @@ _Note:_ This list can likely get outdated. If so, please refer to the specific v
 
 Please make sure you are conforming to the `engines` requirements used by the developers/contributors as specified in the [`package.json`](./package.json#engines) and [`recipes/package.json`](./recipes/package.json#engine) files.
 
-Currently, these are the combinations of system dependencies that work for MacOS/Linux/Windows. Versions are pinned down to the patch number so ensure you have the exact matching versions installed and in use.
+Currently, the supported toolchain is Node.js `>=22.18.0 <26` with pnpm `>=10.14.0 <11`. We recommend using the latest patch release inside those ranges, and the build bootstrap will validate the environment for both the main repo and the `recipes` submodule.
 
 ```bash
 # Note: 'jq' is not a required system dependency; its only here to show the combined output of versions needed
 $ jq --null-input '[inputs.engines] | add' < ./package.json < ./recipes/package.json
 {
-  "node": "22.18.0",
-  "pnpm": "10.14.0"
+  "node": ">=22.18.0 <26",
+  "pnpm": ">=10.14.0 <11"
 }
 ```
 
@@ -103,7 +103,7 @@ It is important you execute the last command to get the required submodule (`fer
 
 ### Run the script
 
-Run the following script to install all dependencies, and build Ferdium.
+Run the following script to validate the toolchain, install all dependencies, and build Ferdium. If you prefer to validate the environment first, run `node ./scripts/setup-build-env.mjs` or `pnpm bootstrap`.
 
 ```bash
 # On Unix

@@ -13,16 +13,17 @@
   "repository": "https://github.com/ferdium/ferdium-app.git",
   "private": true,
   "engines": {
-    "node": "22.18.0",
-    "pnpm": "10.14.0"
+    "node": ">=22.18.0 <26",
+    "pnpm": ">=10.14.0 <11"
   },
-  "engine-strict": true,
+  "engine-strict": false,
   "volta": {
     "node": "22.18.0",
     "pnpm": "10.14.0"
   },
   "packageManager": "pnpm@10.14.0",
   "scripts": {
+    "bootstrap": "node scripts/setup-build-env.mjs",
     "prepare": "is-ci || husky",
     "start": "electron ./build",
     "start:local": "cross-env USE_LOCAL_API=1 pnpm start",

@@ -32,15 +32,7 @@ command_exists() {
 #                  Checking the developer environment
 # Check for installed programmes
 command_exists node || fail_with_docs "Node is not installed"
-
-# Check node version
-EXPECTED_NODE_VERSION=$(cat .nvmrc)
-ACTUAL_NODE_VERSION=$(node -v)
-if [ "v$EXPECTED_NODE_VERSION" != "$ACTUAL_NODE_VERSION" ]; then
-  fail_with_docs "You are not running the expected version of node!
-    expected: [v$EXPECTED_NODE_VERSION]
-    actual  : [$ACTUAL_NODE_VERSION]"
-fi
+node ./scripts/setup-build-env.mjs
 
 # Check if the 'recipes' folder is present either as a git submodule or a symbolic link
 if ! [ -f "recipes/package.json" ]; then
@@ -76,31 +68,6 @@ fi
 
 # -----------------------------------------------------------------------------
 # Ensure that the system dependencies are at the correct version - fail if not
-
-# -----------------------------------------------------------------------------
-# Ensure that the system dependencies are at the correct version - recover if not
-# If 'asdf' is installed, reshim for new nodejs if necessary
-command_exists asdf && asdf reshim nodejs
-
-# Ensure that the system dependencies are at the correct version
-# Check pnpm version
-EXPECTED_PNPM_VERSION=$(node -p 'require("./package.json").engines.pnpm')
-ACTUAL_PNPM_VERSION=$(pnpm --version || true) # in case the pnpm executable itself is not present
-if [[ "$ACTUAL_PNPM_VERSION" != "$EXPECTED_PNPM_VERSION" ]]; then
-  npm i -gf pnpm@$EXPECTED_PNPM_VERSION
-fi
-
-# Check pnpm version of the recipes submodule
-EXPECTED_RECIPES_PNPM_VERSION=$(node -p 'require("./recipes/package.json").engines.pnpm')
-if [[ "$EXPECTED_PNPM_VERSION" != "$EXPECTED_RECIPES_PNPM_VERSION" ]]; then
-  fail_with_docs "The expected versions of pnpm are not the same in the main repo and in the recipes submodule, please sync them.
-    expected in recipes  : [$EXPECTED_RECIPES_PNPM_VERSION]
-    expected in main repo: [$EXPECTED_PNPM_VERSION]
-    actual               : [$EXPECTED_PNPM_VERSION]"
-fi
-
-# If 'asdf' is installed, reshim for new nodejs if necessary
-command_exists asdf && asdf reshim nodejs
 
 # -----------------------------------------------------------------------------
 printf "\n*************** Building recipes ***************\n"

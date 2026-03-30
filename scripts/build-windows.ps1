@@ -40,15 +40,7 @@ Function Test-CommandExists { Param ($command, $1)
 # Check for installed programmes
 Test-CommandExists node "Node is not installed"
 Test-CommandExists npm "npm is not installed"
-
-# Check node version
-$EXPECTED_NODE_VERSION = (cat .nvmrc)
-$ACTUAL_NODE_VERSION = (node -v)
-if ("v$EXPECTED_NODE_VERSION" -ne $ACTUAL_NODE_VERSION) {
-  fail_with_docs "You are not running the expected version of node!
-    expected: [v$EXPECTED_NODE_VERSION]
-    actual  : [$ACTUAL_NODE_VERSION]"
-}
+node .\scripts\setup-build-env.mjs
 
 # Check if the 'recipes' folder is present either as a git submodule or a symbolic link
 if (-not (Test-Path -Path recipes\package.json -PathType Leaf)) {
@@ -127,25 +119,6 @@ if((-not $NPM_CONFIG_MSVS_VERSION) -or -not ($EXPECTED_MSVST_VERSION -contains $
 }
 
 
-# -----------------------------------------------------------------------------
-# Ensure that the system dependencies are at the correct version - recover if not
-# Check pnpm version
-$EXPECTED_PNPM_VERSION = (Get-Content package.json | ConvertFrom-Json).engines.pnpm
-$ACTUAL_PNPM_VERSION = pnpm --version 2>$null  # in case the pnpm executable itself is not present
-if ($ACTUAL_PNPM_VERSION -ne $EXPECTED_PNPM_VERSION) {
-  npm i -gf pnpm@$EXPECTED_PNPM_VERSION
-}
-
-# Check pnpm version of the recipes submodule
-$EXPECTED_RECIPES_PNPM_VERSION = (Get-Content .\recipes\package.json | ConvertFrom-Json).engines.pnpm
-if ($ACTUAL_PNPM_VERSION -ne $EXPECTED_RECIPES_PNPM_VERSION) {
- fail_with_docs "The expected versions of pnpm are not the same in the main repo and in the recipes submodule, please sync them.
-    expected in recipes  : [$EXPECTED_RECIPES_PNPM_VERSION]
-    expected in main repo: [$EXPECTED_PNPM_VERSION]
-    actual               : [$ACTUAL_PNPM_VERSION]"
-}
-
-# -----------------------------------------------------------------------------
 Write-Host "*************** Building recipes ***************"
 Push-Location recipes
 pnpm i
